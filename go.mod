@@ -3,6 +3,7 @@ module web-desktop
 go 1.12
 
 require (
+	github.com/gin-contrib/cors v1.3.1 // indirect
 	github.com/gin-gonic/gin v1.6.2
 	github.com/golang/protobuf v1.3.5 // indirect
 	github.com/google/gofuzz v1.1.0 // indirect

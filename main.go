@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"log"
 	"net/http"
 	"web-desktop/setup"
+	"web-desktop/spa"
 )
 
 func main() {
@@ -31,7 +33,8 @@ func main() {
 		router.Run(portString)
 	}
 
-	http.Handle("/", http.FileServer(http.Dir("./static")))
 	fmt.Println(fmt.Sprintf("\n\n\n\n服务启动成功，请在地址栏输入 http://localhost%s 访问服务\n\n\n\n",portString))
-	http.ListenAndServe(portString, nil)
+	fs := http.FileServer(&spa.FileSystem{Root: http.Dir("static")})
+	http.Handle("/", fs)
+	log.Fatal(http.ListenAndServe(portString,nil))
 }

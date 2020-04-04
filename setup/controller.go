@@ -4,10 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"io/ioutil"
 	"net/http"
-	"os"
-	"web-desktop/writer"
 )
 
 var HomeHandler gin.HandlerFunc = func(c *gin.Context) {
@@ -19,6 +16,7 @@ type ConfigForm struct {
 	Port string `form:"port"`
 }
 
+
 var SubmitConfigHandler gin.HandlerFunc = func(c *gin.Context) {
 	var configForm ConfigForm
 	err := c.ShouldBind(&configForm)
@@ -26,20 +24,16 @@ var SubmitConfigHandler gin.HandlerFunc = func(c *gin.Context) {
 		fmt.Println(err.Error())
 		c.Redirect(500, "/error")
 	}
-	configContent, err := ioutil.ReadFile("static/config.js")
-	if err != nil { // Handle errors reading the config file
+	webConfig := viper.New()
+	webConfig.AddConfigPath("static")
+	webConfig.SetConfigType("json")
+	webConfig.SetConfigName("config")
+	webConfig.Set("apiURL",configForm.ApiURL)
+	err = webConfig.WriteConfig()
+	if err != nil {
 		fmt.Println(err.Error())
 		c.Redirect(500, "/error")
 	}
-
-	//handle api url
-	configContent = writer.WriteJSStringProperty(configContent, "apiURL", configForm.ApiURL)
-	err = ioutil.WriteFile("static/config.js", configContent, os.ModePerm)
-	if err != nil { // Handle errors reading the config file
-		fmt.Println(err.Error())
-		c.Redirect(500, "/error")
-	}
-
 	//server port
 	viper.Set("port",configForm.Port)
 
